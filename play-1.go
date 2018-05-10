@@ -200,3 +200,166 @@ peopleMap := map[string]map[string]int{
 		"height": 17999999,
 	},
 }
+
+
+// functions
+
+func averageSecond(someSlice []float64) float64 {
+	var total float64 = 0
+	for i := 0; i < len(someSlice); i++ {
+		total += someSlice[i]
+	}
+	// will result in error since total and len(someSlice) is different types so...
+	// return total / len(someSlice)
+	return total / float64(len(someSlice))
+}
+
+// in go we can name return types
+func f2() (r int) {
+	r =1
+	return
+}
+
+// WE CAN RETURN MULTIPLE VALUES IN GO!!!!
+func foo() (int, int) {
+	return 5, 6
+}
+
+// this way you can get two values when you call the function later in main like this
+// func main() {
+	firsVal, secondVal := foo()
+// }
+
+// in go return multiple values is used in return the actual value and error or boolean to indicate success
+
+// variadic functions, having one parameter but passing multiple arguments
+
+func add(args ...int) int {
+	total := 0
+	for _, value := range args {
+		total += value
+	}
+	return total
+}
+// so when you call add() you can do
+add(1, 2, 3) // passing in more than one argument
+// we can even pass slice so long that we trail it with elipses
+
+randomSl := []int{1, 2, 3}
+add(randomSl...)
+
+// functions as variables like arrow functions!!!!!!!!!! (also function within functions)
+func main() {
+	add := func(x, y int) int {
+		return x + y
+	}
+	fmt.Println(add(2, 5))
+}
+
+// HIGHER ORDER FUNCTIONNSSSSSS func that returns a func
+func makeEvenGenerator() func() uint {
+	i := uint(0)
+	return func() uint {
+		ret = i
+		i += 2
+		return ret
+	}
+}
+
+// RECURSIONNNNNNNNNNNN FUNCTION CALLING ITSELF
+// factorial
+func factorial(x uint) uint {
+	if x == 0 {
+		return 1
+	}
+	return x * factorial(x - 1)
+}
+
+// special statements in GO for functions
+
+// defer - schedules a function call to be run after the fucntion compiles
+func first() {
+	fmt.Println("first")
+}
+
+func second() {
+	fmt.Println("second")
+}
+
+func main() {
+	defer second()
+	first()
+}
+
+// will print first then second even though second is called first because it is being deferred meaning it is being told to wait until function compiles
+
+// mostly used in situatioins where resources need to be freed in some way
+f, _ := os.Open(filename)
+defer f.Close()
+
+// PANIC AND RECOVER - recovering from a runtime error
+// *** small not ::: u can directly call (only nameless funcs???????) function while defining it by adding () at the end or (with args here)
+func() {
+	// do something
+}() // calls it here
+
+
+// say we have a func that calls the builtin panic func that will throw some runtime error
+// if it is at the top of the call stack, once its been compiled it will throw error and so rest of code wont run
+// how can we stop this from happening so that even if first on callstack has error, we still recover and run rest of code?
+// USING DEFER AND RECOVER
+
+func main() {
+	defer func() {
+		str := recover()
+		fmt.Println(str)
+	}()
+	panic("PANIC")
+}
+
+// POINTERS
+
+// consider the examples below
+func zero(x int) {
+	x = 0
+}
+
+func main() {
+	x := 5
+	zero(x)
+	fmt.Println()
+}
+
+// main function will still print 5 here because it copies the variable argument within the function and so it doesnt mutate the original argument
+// we can modify original argument if we want to by using special data type called pointers
+func zero(xPtr *int) {
+	*xPtr = 0
+}
+
+func main() {
+	x := 5
+	zero(&x)
+	fmt.Println(x)
+}
+
+// * will point to a memory location specified and access or write something in that memory space
+// & is to find the memory space of a variable (it returns a pointer to int)
+
+// new way of doing it is using new() built in function
+func one(xPtr *int) {
+	*xPtr = 1
+}
+
+func main() {
+	xPtr := new(int)
+	one(xPtr)
+	fmt.Println(*xPtr) // x is 1
+}
+
+// new() will take type as arg and allocates enough memory to fit a value of that type, and returns pointers to it
+// in GO new() and & is the same unlike other languages
+// it is a garbage collecting language so memory is automatically cleaned up when not in use
+
+
+// ---------------------------------
+// STRUCTS and INTERFACES
