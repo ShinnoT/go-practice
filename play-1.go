@@ -363,3 +363,109 @@ func main() {
 
 // ---------------------------------
 // STRUCTS and INTERFACES
+
+// structs similar to classes
+type Circle struct {
+	x float64
+	y float64
+	r float64
+}
+// short hand:
+type Circle struct {
+	x, y, r float64
+}
+
+// creating instances of new Circle type:
+var c Circle
+// a more uncommon way below
+c := new(Circle)
+
+// how to set initial values and not just empty instances?
+c := Circle{x: 0, y: 0, r: 5}
+// if we know the order the fields were defined we can do
+c := Circle{0, 0, 5}
+// if you want a pointer to the struct use &
+c := &Circle{0, 0, 5}
+
+// we can access fields of instances using . notation
+fmt.Println(c.r)
+c.x = 10
+// etc.
+
+// if we want to modify fields of instances of Circle, obvie gotta use pointer
+func circleArea(c *Circle) float64 {
+	return math.Pi * c.r*c.r
+}
+
+func main() {
+	c := Circle{0,0,5}
+	fmt.Println(circleArea(&c))
+}
+
+// Methods - special type of functions called methods
+// instance methods for the structs you made!!!!!!
+
+// before the name of the function, we specify which struct to attach the function to
+func (circleInstance *Circle) area() float64 {
+	return math.Pi * circleInstance.r*circleInstance.r
+}
+// now we can call it using . notation on the instance of the struct
+fmt.Println(c.area())
+
+
+// embedded types
+type Person struct {
+	Name string
+}
+func (p *Person) Talk() {
+	fmt.Println("Hi my name is ", p.Name)
+}
+// type Employee struct {
+// 	Person Person
+// 	Position string
+// }
+// but this says employee HAS a person not IS a person
+// so instead we can do
+type Employee struct {
+	Person
+	Position string
+}
+randomEmployee := Person{Position: "software engineer"} //?????
+randomEmployee.Person.Talk()
+randomEmployee.Talk()
+
+// Interface
+// area() is common to all shapes fot ex. so we make parent method interface to apply to all shapes instead of defining it for each
+type Shape interface {
+	area() float64
+}
+func totalArea(shapes ...Shape) float64 {
+	var area float64
+	for _, s := range shapes {
+		area += s.area()
+	}
+	return area
+}
+// if we have c Circle and r Radius
+fmt.Println(totalArea(&c, &r))
+// all that the totalArea knows is that there is an area() method for each Shape
+// so it can only access area() of each shape struct such as Circle or Rectangle
+// it CANNOT access anything else like the radius for example
+
+// interfaces can also be used as fields
+type MultiShape struct {
+	shapes []Shape
+}
+
+multiShapeOne := MultiShape{
+	shapes: []Shape{
+		Circle{0,0,5},
+		Rectangle{0,0,10,10},
+	},
+}
+
+// interfaces become useful as the program develops
+// allows us to hide incidental details of implementation
+// in our example, as long as the area() method is defined in all shape structs like Circle or Rectangle
+// we are free to do whatever with other fields without having to modify the interface method
+
