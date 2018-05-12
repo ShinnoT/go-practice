@@ -469,3 +469,88 @@ multiShapeOne := MultiShape{
 // in our example, as long as the area() method is defined in all shape structs like Circle or Rectangle
 // we are free to do whatever with other fields without having to modify the interface method
 
+// ----------------------------
+// PACKAGES
+// packages include a variety of reusable functions
+	// reduces change of overlappnig names, in turn keeping function names short
+	// organizes code so easy to find what u want to use
+	// speeds up compiler by only requiring recompilation of smaller chunks of a program
+
+
+// core packages:
+
+import (
+	"fmt"
+	"strings"
+	"io"
+	"bytes"
+	"os"
+	"io/ioutil"
+)
+
+func main() {
+	// string manipulation package "string"
+	fmt.Println(strings.Contains("test", "es")) // true
+	fmt.Println(strings.Count("test", "t")) // 2
+	fmt.Println(strings.HasPrefix("test", "te")) // true
+	fmt.Println(strings.HasSuffix("test", "st")) // true
+	fmt.Println(strings.Index("test", "e")) // 1
+	fmt.Println(strings.Join([]string{"a", "b"}, "-")) // "a-b"
+	fmt.Println(strings.Repeat("a", 5)) // "aaaaa"
+	fmt.Println(strings.Replace("aaaa", "a", "b", 2)) // "bbaa" (put -1 to have it repeat for every accurance)
+	fmt.Println(strings.Split("a-b-c", "-")) // []string{"a", "b", "c"}
+	fmt.Println(strings.ToLower("TEST")) // "test"
+	fmt.Println(strings.ToUpper("test")) // "TEST"
+	// work with strings as binary data. string to slice of binary data and vise versa
+	arr:= []byte("test")
+	str := string([]byte{'t', 'e', 's', 't'})
+
+	// input output package "io"
+	// consists of few functions but mostly interfaces used in other packages
+	// most notably the Reader and Writer interfaces
+
+	// to read or write to []byte or string, use Buffer struct in bytes package
+	var buf bytes.Buffer
+	buf.Write([]byte("test"))
+	// you can convert buf into []byte by calling buf.Bytes()
+	// if you only need to read from string use strings.NewReader --> more efficient than Buffer
+
+}
+
+func filesAndFolder() {
+	// files and folders package "os"
+	// here is code to open contents of file and print on terminal
+	file, err := os.Open("test.txt")
+	if err != nil {
+		fmt.Println("sorry there was an error")
+		return
+	}
+	defer file.Close() // we use this line to ensure that the file is complete only right after function completes
+
+	// get the file size
+	stat, err := file.Stat()
+	if err != nil {
+		fmt.Println("error again sorry")
+		return
+	}
+	// read the file
+	bs := make([]byte, stat.Size())
+	_, err = file.Read(bs)
+	if err != nil {
+		fmt.Println("lol another error")
+		return
+	}
+	str := string(bs)
+	fmt.Println(str)
+}
+
+// since reading files is common, theres another shorter way to do the above
+func shorterReadFile() {
+	bs, err := ioutil.ReadFile("test.txt")
+	if err != nil {
+		fmt.Println("error dangerrrr")
+		return
+	}
+	str := string(bs)
+	fmt.Println(str)
+}
