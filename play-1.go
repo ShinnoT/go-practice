@@ -781,3 +781,46 @@ func main() {
 	var input string
 	fmt.Scanln(&input)
 }
+// this example uses the encoding/gob package which makes it easy to encode Go values so that other Go programs (or the same program) can read them
+
+// HTTP SERVERS!!!
+// http servers are even easier to set up and use:
+import (
+	"net/http"
+	"io"
+)
+
+func hello(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set(
+		"Content-Type",
+		"text/html",
+	)
+	io.WriteString(
+		res,
+		`<DOCTYPE html>
+		<html>
+			<head>
+				<title>Hello, World</title>
+			</head>
+			<body>
+				Hello world!
+			</body>
+		</html>`,
+	)
+}
+
+func main() {
+	http.HandleFunc("/hello", hello)
+	http.ListenAndServe(":9000", nil)
+}
+// HandleFunc handles a URL route (/hello) by calling the given function
+
+// we can also handle static files by using FileServer
+http.Handle(
+	"/assets/",
+	http.StripPrefix(
+		"/assets/",
+		http.FileServer(http.Dir("assets")),
+	),
+)
+
