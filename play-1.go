@@ -554,3 +554,230 @@ func shorterReadFile() {
 	str := string(bs)
 	fmt.Println(str)
 }
+
+// creating a file
+func writeFile() {
+	file, err := os.Create("test.txt")
+	if err != nil {
+		fmt.Println("omg error")
+		return
+	}
+	defer file.Close()
+
+	file.WriteString("test")
+}
+
+// open contents of directory
+func openDirectory() {
+	dir, err := os.Open(".")
+	if err != nil {
+		return
+	}
+	defer dir.Close()
+
+	// Readdir takes one argument, a int that limits the number of files returned
+	// by passing in -1 we return ALL the files
+	fileInfos, err := dir.Readdir(-1)
+	if err != nil {
+		return
+	}
+	for _, fi := range fileInfos {
+		fmt.Println(fi.Name())
+	}
+}
+
+// sometimes we want to recursively crawl (walk) a folder
+// read a folder, its files, subfolders, then subfolders of those folders, etc. etc.
+// to do this, there is a path/filepath package
+
+import {
+	"fmt"
+	"os"
+	"path/filepath"
+}
+
+func readAllFoldersAndSubfolders() {
+	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		fmt.Println(path)
+		return nil
+	})
+}
+// the function passed to filepath.Walk() will be called for every file and folder in the root folder
+// filepath.SkipDir ?????
+
+
+// Error type and creating custom errors
+import "errors"
+
+func main() {
+	err := errors.New("custom error message")
+}
+
+// CONTAINERS AND SORT
+
+// container/list package implements a doubly linked list
+// each node of the list contains a value and a pointer to the next node
+// since doubly linked list, each node will also have pointers to the previous node
+// we can create a doubly linked list as such:
+
+import (
+	"fmt"
+	"container/list"
+)
+
+func main() {
+	var x list.List
+	x.PushBack(1)
+	x.PushBack(2)
+	x.PushBack(3)
+
+	for e := x.Front(); e != nil; e=e.Next() {
+		fmt.Println(e.Value.(int))
+	}
+}
+// we print every value of each node by iterating starting from the first node in the linked list
+
+
+// SORT!!!!!!
+// sort package contains functions for sorting arbitrary data
+// predifined sorts for slices
+
+import (
+	"fmt"
+	"sort"
+)
+
+type Person struct {
+	Name string
+	Age int
+}
+
+type ByName []Person
+
+func (ps ByName) Len() int {
+	return len(ps)
+}
+
+func (ps ByName) Less(i, j int) bool {
+	return ps[i].Name < ps[j].Name
+}
+
+func (ps ByName) Swap(i, j int) {
+	ps[i], ps[j] = ps[j], ps[i]
+}
+
+func main() {
+	kids := []Person{
+		{"Jill",9},
+		{"Jack",10},
+	}
+	sort.Sort(ByName(kids))
+	fmt.Println(kids)
+}
+// Len, Less, and Swap functions are necessary for sort algorithms
+
+
+// HASHES AND CRYPTOGRAPHY
+// takes set of data and reduces it to a smaller fixed size
+// two types: cryptographic and non-cryptographic
+
+// non-cryptographic found under hash package
+// adler32, crc32, crc64, and fnv
+import (
+	"fmt"
+	"hash/crc32"
+)
+
+func main() {
+	// create hasher
+	h := crc32.NewIEEE()
+	// write our data to it
+	h.Write([]byte("test"))
+	// calculate the crc32 checksum
+	v := h.Sum32()
+	fmt.Println(v)
+}
+
+// cyptographic hashing is the same but made almost irrevirsible
+// so that one cannot reproduce the hash
+import (
+	"fmt"
+	"crypto/sha1"
+)
+
+func main() {
+	h := sha1.New()
+	h.Write([]byte("test"))
+	bs := h.Sum([]byte{})
+	fmt.Println(bs)
+}
+// same as non-cryptgraphic hash except crc32 computes 32-bit hash, sha1 computes 160-bit hash
+// no native type to represent a 160-bit number, so we use slice of 20bytes instead
+
+
+
+// SERVERS
+// TCP - primary protocol for communication over the internet
+
+import (
+	"encoding/gob"
+	"fmt"
+	"net"
+)
+
+func server() {
+	// listen on a port
+	ln, err := net.Listen("tcp", ":9999")
+	if err != nil {
+		dmt.Println(err)
+		return
+	}
+	for {
+		// accept a connection
+		c, err := ln.Accept()
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		// handle the connection (function defined below)
+		go handleServerConnection(c)
+	}
+}
+
+func handleServerConnection(c net.Conn) {
+	// receive the message
+	var msg string
+	err := gob.NewDecoder(c).Decode(&msg)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Received", msg)
+	}
+	c.Close()
+}
+
+func client() {
+	// connect to the server
+	c, err := net.Dial("tcp", "127.0.0.1:9999")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	msg := "Hello, World"
+	fmt.Println("Sending", msg)
+	err = gob.NewEncoder(c).Encode(msg)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	c.Close()
+}
+
+func main() {
+	go server()
+	go client()
+
+	var input string
+	fmt.Scanln(&input)
+}
