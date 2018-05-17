@@ -829,3 +829,95 @@ http.Handle(
 // rather than just in the program running them
 // ------ im guessing this is similar to meteor methods??? where u can call backend function in the client
 
+
+
+// PARSING COMMAND LINE ARGUMENTS
+
+// example program which generates a number between 0 and 6
+// we can change max value by sending (-mx=100) flag
+import (
+	"fmt"
+	"flag"
+	"math/rand"
+)
+
+func main() {
+	// define flags
+	maxp := flag.Int("max", 6, "the max value")
+	// parse
+	flag.Parse()
+	// generate a number between 0 and max
+	fmt.Println(rand.Intn(*maxp))
+}
+// any additional non-fleg arguments can be retriever with flag.Args() which returns an array of string []string
+
+// CREATING OUR OWN PACKAGES!!
+// say we want to make a package called math
+
+// inside some-directory create main.go (some-directory/main.go)
+package main
+
+import "fmt"
+import "some-directory/math"
+
+func main() {
+	xs := []float64{1, 2, 3, 4}
+	avg := math.Average(xs)
+	fmt.Println(avg)
+}
+
+// to use the package called math (not the built in package but our custom math package)
+// we must create a file called math.go inside math directory (some-directory/math/math.go)
+// in this file we will name our package and define function we want to export
+package math
+
+func Average(xs []float64) float64 {
+	total := float64(0)
+	for _, x := range xs {
+		total += x
+	}
+	return total / float64(len(xs))
+}
+
+// note that exported functions must be CAPITAL LETTER
+// you can also make aliases when importing
+import m "some-directory/math" // this way you can use m.Average instead of math.Average
+// finally, package names must be the same name as its directory name although there are workarounds to this
+
+
+// DOCUMENTATION
+// go allows us to generate documentation for our packages really easily
+// if we typ:
+godoc some-directory/math Average
+// into our terminal, we should see:
+func Average(xs []float64) float64
+// displayed on our termina
+// however by adding comment above our function giviing details about the function
+// we can have this displayed instead:
+func Average(xs []float64) float64
+	Finds the average of a series of numbers
+// this doc is also available in web form by running this command:
+godoc -http=":6060"
+// and entering this url into your browser
+http://localhost:6060/pkg/
+
+
+//TESTING!!!
+// if we wanted to run tests for our custom math package
+// we must include file called math_test.go
+// go knows that files which end in _test.go will be test files
+// in math_test.go
+package math // must name package same as the package we are testing
+
+import "testing"
+
+// must name test func starting with Test (capiitalized always)
+func TestAverage(t *testing.T) {
+	v := Average([]float64{1,2})
+	if v != 1.5 {
+		t.Error("expected 1.5, got ", v)
+	}
+}
+
+// to run tests run this command in the same dir
+go test
