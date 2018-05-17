@@ -824,3 +824,8 @@ http.Handle(
 	),
 )
 
+// net/rpc (remote procedure call) net/rpc/jsonrpc packages
+// privde easy way to expose methods so they can be invoked over a network
+// rather than just in the program running them
+// ------ im guessing this is similar to meteor methods??? where u can call backend function in the client
+
