@@ -921,3 +921,49 @@ func TestAverage(t *testing.T) {
 
 // to run tests run this command in the same dir
 go test
+
+// view p.84 for more!!!
+
+// GO ROUTINES
+// running synchronous code concurrently
+func f(from string) {
+	for i := 0; i < 3; i++ {
+		fmt.Println(from, ":", i)
+	}
+}
+
+func main() {
+	f("direct")
+// notice the go keywords below
+	go f("goroutine")
+
+	go func(msg string) {
+		fmt.Println(msg)
+	}("helloooo")
+}
+// this will print to the console:
+// direct:0
+// direct:1
+// direct:2
+// goroutine:0
+// heloooo
+// goroutine:1
+// goroutine:2
+
+
+// Channels are the pipes that connect concurrent goroutines. You can send values into channels from one goroutine and receive those values into another goroutine.
+func main() {
+	// make new channel
+	messages := make(chan string)
+
+	// send value into channel using channel <- value notation
+	// from goroutine
+	go func() {messages <- "ping"}()
+
+	// reveive value from channel using variableName := <-channel notation
+	msg := <-messages
+
+	fmt.Println(msg)
+}
+
+// https://gobyexample.com/channels
